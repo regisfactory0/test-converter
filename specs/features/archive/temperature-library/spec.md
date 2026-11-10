@@ -1,6 +1,6 @@
 ---
 title: Temperature conversion library and unit registry
-status: ready
+status: done
 ticket: —              # this project uses no ticket system
 origin: —
 created: 2026-11-10
@@ -191,6 +191,31 @@ n/a — library only; no user interface.
 ## Open questions
 
 - None.
+
+## Verification
+
+QA verdicts, 2026-11-10. `tests/acceptance/test_library.py` and `tests/unit`
+pass; failures elsewhere in the suite belong to the CLI and list features.
+
+| Criterion | Verdict | Note |
+|---|---|---|
+| AC-1.1 | pass | `convert(100, "C", "F")` returns `211.99999999999997`, within 1e-9 of `212.0`; not bit-exact |
+| AC-1.2 | pass | |
+| AC-1.3 | pass | |
+| AC-1.4 | pass | |
+| AC-1.5 | pass | |
+| AC-1.6 | pass | |
+| AC-1.7 | pass | |
+| AC-1.8 | pass | |
+| AC-1.9 | pass | |
+| AC-2.1 | pass | |
+| AC-2.2 | pass | |
+| AC-2.3 | pass | |
+| AC-2.4 | pass | |
+
+AC-1.1 observation: the criterion reads "returns `212.0`", but the float result
+is `211.99999999999997`. AC-1.2 sets the 1e-9 tolerance, and the CLI rounds to
+6 places, so `conv 100 C F` prints `212.0`.
 
 ## Links
 
