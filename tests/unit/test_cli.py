@@ -91,7 +91,7 @@ def test_wrong_argument_count_prints_usage_and_error(capsys: Capsys, argv: tuple
     assert_usage_and_error(*run(capsys, *argv))
 
 
-@pytest.mark.parametrize("option", ["--", "--list", "--bogus", "-x", "-"])
+@pytest.mark.parametrize("option", ["--", "--bogus", "-x", "-"])
 def test_unknown_option_prints_usage_and_error(capsys: Capsys, option: str) -> None:
     assert_usage_and_error(*run(capsys, option, "C", "F"))
 
@@ -171,3 +171,49 @@ def test_library_error_message_is_relayed_on_one_line(
 
     monkeypatch.setattr(conv.cli, "convert", failing_convert)
     assert run(capsys, "1", "C", "F") == (1, "", "conv: error: boom\n")
+
+
+def test_list_line_is_name_then_symbol_and_name_per_unit_in_order(capsys: Capsys) -> None:
+    registry = Registry()
+    registry.register(
+        Quantity(
+            name="amount",
+            base="u",
+            units=(
+                Unit(symbol="ku", name="kilounit", factor=1000.0),
+                Unit(symbol="u", name="unit"),
+            ),
+        )
+    )
+    assert main(["--list"], registry) == 0
+    assert capsys.readouterr().out == "amount: ku (kilounit), u (unit)\n"
+
+
+def test_list_single_unit_quantity_has_no_separator(capsys: Capsys) -> None:
+    registry = Registry()
+    registry.register(Quantity(name="solo", base="s", units=(Unit(symbol="s", name="single"),)))
+    assert main(["--list"], registry) == 0
+    assert capsys.readouterr().out == "solo: s (single)\n"
+
+
+def test_list_uses_default_registry_when_none_given(capsys: Capsys) -> None:
+    assert run(capsys, "--list") == (
+        0,
+        "temperature: C (celsius), F (fahrenheit), K (kelvin)\n",
+        "",
+    )
+
+
+@pytest.mark.parametrize(
+    "argv",
+    [
+        ("--list", "1", "C", "F"),
+        ("1", "C", "F", "--list"),
+        ("-40", "C", "F", "--list"),
+        ("--list", "x"),
+    ],
+)
+def test_list_with_other_arguments_prints_usage_and_error_only(
+    capsys: Capsys, argv: tuple[str, ...]
+) -> None:
+    assert_usage_and_error(*run(capsys, *argv))
