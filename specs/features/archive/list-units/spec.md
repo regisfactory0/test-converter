@@ -1,10 +1,10 @@
 ---
 title: List quantities and units
-status: ready
+status: done
 ticket: —              # this project uses no ticket system
 origin: —
 created: 2026-11-10
-updated: 2026-11-10
+updated: 2026-11-11
 owner: developer
 ---
 
