@@ -117,5 +117,5 @@ The CLI reads the registry only through `Registry.quantities()` and the
 
 - Ticket: —
 - Design: n/a
-- Related specs: `specs/features/backlog/cli-conversion/spec.md` (built before
+- Related specs: `specs/features/archive/cli-conversion/spec.md` (built before
   this one), `specs/features/archive/temperature-library/spec.md`

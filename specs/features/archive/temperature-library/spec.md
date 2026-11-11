@@ -221,5 +221,5 @@ is `211.99999999999997`. AC-1.2 sets the 1e-9 tolerance, and the CLI rounds to
 
 - Ticket: —
 - Design: n/a
-- Related specs: `specs/features/backlog/cli-conversion/spec.md`,
+- Related specs: `specs/features/archive/cli-conversion/spec.md`,
   `specs/features/backlog/list-units/spec.md`
