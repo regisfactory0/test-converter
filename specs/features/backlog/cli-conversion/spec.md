@@ -154,5 +154,5 @@ before it.
 
 - Ticket: —
 - Design: n/a
-- Related specs: `specs/features/backlog/temperature-library/spec.md` (built
+- Related specs: `specs/features/archive/temperature-library/spec.md` (built
   before this one), `specs/features/backlog/list-units/spec.md`
