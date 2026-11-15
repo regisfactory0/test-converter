@@ -37,6 +37,28 @@ Units are matched case-insensitively by symbol (`C`, `F`, `K`) or full name
 (`celsius`, `fahrenheit`, `kelvin`). Invalid input prints a one-line
 `conv: error: …` message on stderr and exits with code 1.
 
+## Distance
+
+`-d` / `--distance`, anywhere on the command line, switches `conv` from
+temperature to distance: metric (`mm`, `cm`, `m`, `km`) and international
+imperial (`in`, `ft`, `yd`, `mi`) units. Distances cannot be negative.
+
+```sh
+uv run conv --distance 1 mi km   # 1.609344
+uv run conv -d 100 km mi         # 62.137119
+uv run conv -d --list
+# distance: mm (millimetre), cm (centimetre), m (metre), km (kilometre), in (inch), ft (foot), yd (yard), mi (mile)
+```
+
+From Python, pass the distance registry to `convert`:
+
+```python
+from conv import convert
+from conv.registry import build_distance_registry
+
+convert(1, "mi", "km", registry=build_distance_registry())  # 1.609344
+```
+
 ## Adding a quantity
 
 A quantity is data: a `Quantity` holding its `Unit`s, both frozen dataclasses

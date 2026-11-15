@@ -1,6 +1,6 @@
 ---
 title: CLI distance mode
-status: ready
+status: done
 ticket: —              # this project uses no ticket system
 origin: —
 created: 2026-11-15
