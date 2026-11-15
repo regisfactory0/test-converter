@@ -160,6 +160,6 @@ the new example valid Python that runs.
 
 - Ticket: —
 - Design: n/a
-- Related specs: `specs/features/backlog/distance-library/spec.md` (built
+- Related specs: `specs/features/archive/distance-library/spec.md` (built
   before this one); `specs/features/archive/cli-conversion/spec.md`,
   `specs/features/archive/list-units/spec.md`.

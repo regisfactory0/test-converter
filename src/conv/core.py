@@ -19,8 +19,8 @@ def _lookup(registry: Registry, spelling: str) -> tuple[Quantity, Unit]:
 
 
 def _below_minimum_message(quantity: Quantity) -> str:
-    if quantity.name == "temperature":
-        return "value is below absolute zero"
+    if quantity.below_min_message is not None:
+        return quantity.below_min_message
     return f"value is below the minimum for {quantity.name}"
 
 
@@ -44,7 +44,10 @@ def convert(value: float, from_unit: str, to_unit: str, registry: Registry | Non
     base = value * source.factor + source.offset
     minimum = source_quantity.min_base
     if minimum is not None and base < minimum:
-        if base < minimum - MIN_BASE_TOLERANCE:
+        tolerance = source_quantity.min_tolerance
+        if tolerance is None:
+            tolerance = MIN_BASE_TOLERANCE
+        if base < minimum - tolerance:
             raise ConversionError(_below_minimum_message(source_quantity))
         base = minimum
     result = float((base - target.offset) / target.factor)
