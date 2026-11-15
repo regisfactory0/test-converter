@@ -16,12 +16,18 @@ class Unit:
 
 @dataclass(frozen=True)
 class Quantity:
-    """A quantity: its base unit symbol, its units in order, an optional minimum base value."""
+    """A quantity: its base unit symbol, its units in order, an optional minimum base value.
+
+    Base values below ``min_base`` by at most ``min_tolerance`` are clamped to it; ``None``
+    means the core's default tolerance. ``below_min_message`` replaces the generic error text.
+    """
 
     name: str
     base: str
     units: tuple[Unit, ...]
     min_base: float | None = None
+    min_tolerance: float | None = None
+    below_min_message: str | None = None
 
 
 def _keys(unit: Unit) -> tuple[str, ...]:
@@ -72,9 +78,36 @@ def build_default_registry() -> Registry:
                 Unit(symbol="K", name="kelvin", factor=1.0, offset=0.0),
             ),
             min_base=0.0,
+            below_min_message="value is below absolute zero",
+        )
+    )
+    return registry
+
+
+def build_distance_registry() -> Registry:
+    """A fresh registry holding only distance, in metric and international imperial units."""
+    registry = Registry()
+    registry.register(
+        Quantity(
+            name="distance",
+            base="m",
+            units=(
+                Unit(symbol="mm", name="millimetre", aliases=("millimeter",), factor=0.001),
+                Unit(symbol="cm", name="centimetre", aliases=("centimeter",), factor=0.01),
+                Unit(symbol="m", name="metre", aliases=("meter",), factor=1.0),
+                Unit(symbol="km", name="kilometre", aliases=("kilometer",), factor=1000.0),
+                Unit(symbol="in", name="inch", factor=0.0254),
+                Unit(symbol="ft", name="foot", factor=0.3048),
+                Unit(symbol="yd", name="yard", factor=0.9144),
+                Unit(symbol="mi", name="mile", factor=1609.344),
+            ),
+            min_base=0.0,
+            min_tolerance=0.0,
+            below_min_message="value is negative",
         )
     )
     return registry
 
 
 DEFAULT_REGISTRY = build_default_registry()
+DISTANCE_REGISTRY = build_distance_registry()
