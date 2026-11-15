@@ -162,5 +162,5 @@ n/a — library only; the CLI part is the `cli-distance` feature.
 - Ticket: —
 - Design: n/a
 - Related specs: `specs/features/archive/temperature-library/spec.md` (the
-  registry and `convert` this builds on); `specs/features/backlog/cli-distance/spec.md`
+  registry and `convert` this builds on); `specs/features/archive/cli-distance/spec.md`
   (built after this one).
