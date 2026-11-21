@@ -9,6 +9,7 @@ in the same change as the code.
 | Path | Holds |
 |---|---|
 | `_templates/` | Feature, refactor and issue templates |
+| `system/` | As-built description: `architecture.spec.md`, `features.spec.md` |
 | `features/backlog/<slug>/` | Specs drafted or ready, not started |
 | `features/active/<slug>/` | Approved or in progress |
 | `features/archive/<slug>/` | Done or dropped — a historical snapshot, not rewritten |
@@ -52,8 +53,11 @@ stateDiagram-v2
     ready --> dropped
     approved --> dropped
     in_progress --> dropped
+    done --> removed : /spec-cleanup
+    dropped --> removed : /spec-cleanup
     done --> [*]
     dropped --> [*]
+    removed --> [*]
 ```
 
 | Step | Owner | Result |
@@ -65,6 +69,7 @@ stateDiagram-v2
 | Verify per criterion | `qa` | pass / fail / blocked per criterion |
 | Archive | `qa` (or `ba` if the project has no `qa`) | `archive/<slug>/`, `done` |
 | Drop, on the user's decision | `ba` | `archive/<slug>/`, `dropped` with `dropped: <reason>` |
+| Remove, once no longer needed | `ba` through `/spec-cleanup` | folder deleted; content in the system specs |
 
 `developer` works only from `active/` at `approved` or later.
 
@@ -83,6 +88,31 @@ Archive (or drop) in this order:
    `status: done` (or `dropped` with `dropped: <reason>`).
 
 Never archive as `done` with a failing or unverified criterion.
+
+## Cleanup
+
+`/spec-cleanup` removes archived specs that are no longer needed. Git keeps
+every removed file; the as-built system specs keep what the spec said.
+
+1. **Carry the content first.** Before a folder goes, the system specs carry
+   the spec's behaviour, its decisions with their reasons, its constraints, and
+   every criterion not yet verified (a manual check, one waiting on a run),
+   named there as still to check. A repository without `specs/system/` gets
+   `specs/system/features.spec.md` first.
+2. **Find every reference.** A reference is, in any tracked text file, a path
+   to the removed folder or to a file in it
+   (`specs/features/archive/<slug>`), or a relative link that resolves into it.
+   A slug alone (a test marker, a branch name) is not a reference.
+3. **Repoint or remove it.** A reference in Markdown points to the system-spec
+   section that now carries the content, or goes with its sentence when that
+   sentence only pointed to the spec. A link from one removed spec to another
+   goes with its file. A reference in source or test code (a docstring, a file
+   name) is changed by `developer` or `tester`; a comment never names a spec.
+4. **Delete the folder.** A plain delete (`rm -r specs/features/archive/<slug>`),
+   left unstaged like every other change.
+
+Nothing is deleted or repointed before the user approves the list of slugs
+and the system-spec diff.
 
 ## Issues
 
@@ -123,3 +153,5 @@ candidates, and changes nothing without approval.
 - **Acceptance criteria are numbered and objectively pass/fail.**
 - **A wrong spec stops work.** The finder reports it; only `ba` revises the
   spec, and the user re-approves a changed scope.
+- **Cite `specs/system/`, never restate it.** A change to the system — a new
+  integration, module, layer boundary or gate — updates it in the same change.

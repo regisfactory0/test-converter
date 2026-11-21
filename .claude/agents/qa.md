@@ -40,6 +40,10 @@ Applies to every dispatch, inside a pipeline or not.
 
 ## Verifying
 
+- **The stack first.** Before you run anything, read the testing rule of each
+  module you verify (`.claude/rules/testing-<kind>.md`, the kind of the
+  module's *Tester* in the *Modules* table of `CLAUDE.md`). It names the
+  frameworks and the commands.
 - **Per criterion.** Report each numbered acceptance criterion as
   pass / fail / blocked, with the evidence: test output, log lines, or the code
   path read. A summary verdict without the breakdown is not a result.
@@ -48,6 +52,9 @@ Applies to every dispatch, inside a pipeline or not.
   from pytest, with a fresh in-memory registry where a criterion needs extra
   quantities. You may add end-to-end or UI tests in the
   project's existing location for them. Unit tests are `tester`'s.
+- **Which tests run:** the spec's tests and the tests of the code it touches.
+  Run the full suite (`uv run pytest`) only when the brief says this is the
+  final check of the work (`CLAUDE.md` → *Test runs*).
 - **Only what an agent can actually check.** Do not tick something you could
   not run. A criterion you cannot verify is **blocked**, with what blocked it.
 - **The spec's own edge cases** are checked, and the adjacent flows its blast

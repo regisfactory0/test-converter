@@ -1,5 +1,5 @@
 ---
-description: Bug pipeline — developer diagnoses, you confirm the cause, then failing test → fix → verify
+description: Bug pipeline — the module's developer diagnoses, you confirm the cause, then failing test → fix → verify
 argument-hint: <ticket | none> <bug-name> <symptom, repro steps, expected vs actual…> | specs/issues/<slug>.md
 allowed-tools: Agent, Read, Glob, Grep, AskUserQuestion, Bash(git status*), Bash(git diff*), Bash(git log*), Bash(git rev-parse*), Bash(git branch --show-current)
 ---
@@ -13,6 +13,12 @@ each brief adds the expected branch and the stage items below.
 
 No spec is written. Out-of-scope findings go to `specs/issues/<slug>.md`
 (`specs/README.md` § Issues).
+
+`developer` and `tester` below are the *Developer* and *Tester* of the module
+that holds the symptom (`CLAUDE.md` → *Modules*, by the module's *Path*). When
+the symptom does not show the module, the *Developer* of the first row
+diagnoses and names the module in its report; the stages after that use that
+module's agents.
 
 ## Arguments
 
@@ -58,7 +64,8 @@ fix → the diagnosis is wrong: back to step 1.
 Brief: cause, test path, its failure output. Fix the root cause with the
 smallest change; no workarounds, no swallowed errors, no tidying nearby. Never
 edit the test — if it is wrong, stop and report. Run the test green, then the
-full suite.
+tests of the code the fix touches. The full suite runs once, at the end of the
+branch's work (`CLAUDE.md` → *Test runs*).
 
 ## 5. Verify
 

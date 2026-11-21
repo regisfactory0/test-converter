@@ -1,5 +1,5 @@
 ---
-description: Feature pipeline — ba writes the spec, you approve, then developer → tester → qa
+description: Feature pipeline — ba writes the spec, you approve, then each module's developer → tester → qa
 argument-hint: <ticket | none> <feature-name> <requirements…> | specs/issues/<slug>.md
 allowed-tools: Agent, Read, Glob, Grep, Edit, AskUserQuestion, Bash(git status*), Bash(git diff*), Bash(git log*), Bash(git rev-parse*), Bash(git branch --show-current), Bash(git mv *)
 ---
@@ -10,6 +10,9 @@ Raw invocation: **$ARGUMENTS**
 
 You orchestrate (`CLAUDE.md` § Orchestrator). Agents carry their own contract;
 each brief adds the expected branch, the spec folder, and the stage items below.
+
+The developer and the tester of a module are the *Developer* and *Tester* of its
+row in `CLAUDE.md` → *Modules*.
 
 ## Arguments
 
@@ -30,7 +33,7 @@ Missing ticket → `—`, no question.
 |---|---|
 | Something already built behaving wrong | "That's a bug — use `/bugfix`." |
 | Restructuring without behaviour change | "That's a refactor — use `/refactor`." |
-| Copy, string or dependency change | "Too small for a spec — dispatching `developer` directly." |
+| Copy, string or dependency change | "Too small for a spec — dispatching the module's developer directly." |
 
 The guard holds mid-pipeline too: if the work changes shape, stop and name the
 pipeline that fits.
@@ -54,7 +57,7 @@ Read the spec when `ba` returns.
 
 ## 3. GATE — the user approves the spec
 
-**Hard stop. Do not dispatch `developer` this turn.** Report:
+**Hard stop. Do not dispatch a developer this turn.** Report:
 
 - spec path and slug (the user may rename it now)
 - the acceptance criteria, verbatim
@@ -72,20 +75,35 @@ change.
 
 Every brief from here gives the folder `specs/features/active/<slug>/`.
 
-**4a. `developer`** — implement against the spec.
-If it stops on a spec problem, do not continue: report to the user and offer to
+**The modules.** Read the spec's *Affected modules and layers* and find each
+module it names in `CLAUDE.md` → *Modules*. A spec that names no module of the
+table, or a module the table does not have, is a spec problem: do not continue;
 send the spec back to `ba`.
 
-**4b. `tester`** — after `developer`, with a summary of what changed. Tests
-from the acceptance criteria and edge cases; full suite green.
-Red because the code misses a criterion → back to 4a with the failures. After
-two round trips, stop and report to the user.
+**4a. Developers** — for each affected module, in the table's order, one after
+the other: dispatch the module's *Developer* to implement its part of the spec
+(name the module and its *Path* in the brief, with what the earlier modules
+changed). Never two developers at once: they share one tree.
+If one stops on a spec problem, do not continue: report to the user and offer
+to send the spec back to `ba`.
 
-**4c. `qa`** — after `tester` is green. Verify per criterion; do not archive in
+**4b. Testers** — after the developers, for each affected module in the same
+order: dispatch the module's *Tester*, with a summary of what changed in it.
+Tests from the acceptance criteria and edge cases of its part; the feature's
+tests and the tests of the code it touches green (not the full suite:
+`CLAUDE.md` → *Test runs*). Red because the code misses a criterion → back to
+4a, to that module's *Developer*, with the failures. After two round trips,
+stop and report to the user.
+
+**4c. `qa`** — after every tester is green. Verify per criterion; do not archive in
 this dispatch. Any fail → back to 4a.
 
 **4d. Archive** — dispatch `qa` with "archive `<slug>`"
 (`specs/README.md` § Archive).
+
+**4e. Full suite** — if this is the last feature of the branch, dispatch `qa`
+for the final check: the full suite (`uv run pytest`). A failure → back to 4a
+for the feature that caused it.
 
 ## Finally
 

@@ -1,5 +1,5 @@
 ---
-description: Refactor pipeline — green baseline first, spec and gate only across boundaries, then developer → tester proves nothing changed
+description: Refactor pipeline — green baseline first, spec, architect and gate only across boundaries, then developer → tester proves nothing changed
 argument-hint: <ticket | none> <refactor-name> <what to change and why…> | specs/issues/<slug>.md
 allowed-tools: Agent, Read, Glob, Grep, Edit, AskUserQuestion, Bash(git status*), Bash(git diff*), Bash(git log*), Bash(git rev-parse*), Bash(git branch --show-current), Bash(git mv *)
 ---
@@ -13,6 +13,10 @@ each brief adds the expected branch, the spec folder or issues location, and the
 stage items below.
 
 **Behaviour does not change.** Every stage exists to prove it.
+
+`developer` and `tester` below are the *Developer* and *Tester* of each module
+the refactor touches (`CLAUDE.md` → *Modules*, by the module's *Path*). For
+several modules, dispatch them one after the other, in the table's order.
 
 ## Arguments
 
@@ -38,9 +42,18 @@ one line.
 
 **Spec branch.** Dispatch `ba` for `specs/features/backlog/<slug>/spec.md` from
 `specs/_templates/refactor-template.md`, with individually buildable migration
-steps and a concrete behaviour-preservation list. Then **hard stop** with the
-target state, steps, affected modules and rollback, and wait for approval. On
-approval: `git mv` to `specs/features/active/<slug>/`, set `status: approved`.
+steps and a concrete behaviour-preservation list.
+
+When the refactor crosses a module or public-API boundary, then dispatch
+`architect` with the spec: it updates `specs/system/architecture.spec.md` and
+`.claude/rules/architecture.md` to the target state, and files issues for the
+gaps it finds.
+
+Then **hard stop** with the target state, steps, affected modules, rollback and,
+across a boundary, the architecture diff, and wait for approval: the approval
+covers the spec and the architecture. On approval: `git mv` to
+`specs/features/active/<slug>/`, set `status: approved`; when `architect` gave a
+new `Architecture:` line, put it into `CLAUDE.md`.
 
 ## 2. `tester` — green baseline first
 

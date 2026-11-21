@@ -31,8 +31,17 @@ only at runtime; package `conv` in `src/conv/`, built with `uv_build`; console
 script `conv` in `[project.scripts]`; pytest for unit (`tests/unit`) and
 acceptance (`tests/acceptance`) tests; ruff for lint and format.
 
-Architecture: layered library with a thin CLI. Dependency direction: `cli` → `core` → `registry`.
+Architecture: Layered library with a thin CLI. Dependency direction: `cli` → `core` → `registry`.
 Rules for writing code against it: `.claude/rules/architecture.md`.
+
+## Modules
+
+Each module has its own developer and tester agent. The pipelines dispatch the
+*Developer* and the *Tester* of a module for the work in its *Path*.
+
+| Module | Path | Purpose | Developer | Tester |
+|---|---|---|---|---|
+| `conv` | `src/conv/` | The library and its CLI, in three layers: `registry` (units as data), `core` (conversion), `cli` (argument parsing and output) | developer-backend | tester-backend |
 
 ## Commands
 
@@ -43,6 +52,12 @@ Rules for writing code against it: `.claude/rules/architecture.md`.
 | One test | `uv run pytest <pattern>` |
 | Lint | `uv run ruff check .` |
 | Format check | `uv run ruff format --check .` |
+
+**Test runs.** While a task is in development, run only the tests related to
+it: the tests written or changed for it and the tests of the code it touches
+(`uv run pytest <pattern>`). Run the full suite (`uv run pytest`) only once, at the
+end, to verify the full scope: after the last task of the branch, before the
+PR.
 
 Environment: `uv sync`. Run these in the foreground with a
 10-minute timeout — never in the background.
@@ -58,6 +73,8 @@ Environment: `uv sync`. Run these in the foreground with a
 | File | Loads | Covers |
 |---|---|---|
 | `.claude/rules/code-style.md` | source and test files | Conventions, naming, comments, errors |
+| `.claude/rules/code-style-<kind>.md` | the source and test files of a module of that kind | Language conventions, lint and format |
+| `.claude/rules/testing-<kind>.md` | the test files of a module of that kind | Test frameworks, conventions and commands |
 | `.claude/rules/architecture.md` | source files | Layers, boundaries, dependencies |
 | `.claude/rules/git.md` | always | Commits, staging, branches, PRs |
 | `.claude/rules/documentation.md` | Markdown in `specs/`, `docs/` | Diagrams, references, prose |
@@ -76,8 +93,8 @@ code, tests or specs yourself, and you do not re-run an agent's build or tests.
 | Agent | Use for | Deliverable |
 |---|---|---|
 | `ba` | Requirements, specs, feasibility, issue triage | Spec in `specs/features/backlog/` |
-| `developer` | Implementation, diagnosis, fixes | Source code |
-| `tester` | Unit and integration tests, baselines | Test files, test run results |
+| `architect` | Modules, layers, boundaries, dependencies | `specs/system/architecture.spec.md`, `.claude/rules/architecture.md`, issues |
+| the developer and tester of each module: *Modules* | Implementation, diagnosis, fixes; unit and integration tests, baselines | Source code; test files, test run results |
 | `qa` | Verification against acceptance criteria, archiving specs | Per-criterion report |
 
 | Request | Route |
@@ -85,7 +102,9 @@ code, tests or specs yourself, and you do not re-run an agent's build or tests.
 | New or changed behaviour | `/feature` |
 | Something built behaves wrong | `/bugfix` |
 | Restructure without behaviour change | `/refactor` |
-| Copy or string change, dependency bump, single-file tweak | `developer` directly |
+| Archived specs no longer needed | `/spec-cleanup` |
+| Copy or string change, dependency bump, single-file tweak | the module's *Developer* directly |
+| Architecture change without code (the architecture spec or rule) | `architect` directly |
 | Fits none of these | Ask the user — do not guess |
 
 - **Outside a pipeline, describe the approach and wait for approval** before

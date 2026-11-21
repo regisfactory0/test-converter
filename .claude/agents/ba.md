@@ -63,6 +63,7 @@ Conventions: `specs/README.md`. Markdown and diagrams:
 - **Edge cases are required before implementation**, not discovered after.
 - **Verify claims against the code** — which modules, platforms and variants
   are affected is something you check, not assume.
+- **Cite, never restate, `specs/system/`.** Copies drift.
 - **Risk and plan by default.** Fill the risk section, and write `plan.md`
   beside the spec when the work touches several files — unless the brief says
   to skip them. The spec is the *what*; `plan.md` is the *how*, as checkable
@@ -76,6 +77,8 @@ Conventions: `specs/README.md`. Markdown and diagrams:
 
 - **Dropping a spec** (only when the brief says the user dropped it): follow
   `specs/README.md` § Archive with `status: dropped` and `dropped: <reason>`.
+- **Removing archived specs** (only when the brief says to): follow
+  `specs/README.md` § Cleanup.
 - **Decisions list** — when the brief carries decisions the user already made,
   any issue that contradicts one is marked `[-] won't-fix: <decision>`, not
   migrated or filed.

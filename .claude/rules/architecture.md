@@ -6,6 +6,7 @@ paths:
 # Architecture
 
 Rules for **writing** code. What currently exists belongs in the code and
+in `specs/system/architecture.spec.md` —
 not here; inventories restated in rules drift.
 
 ## Structure
