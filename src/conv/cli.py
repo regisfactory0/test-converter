@@ -9,7 +9,7 @@ from conv.registry import DEFAULT_REGISTRY, DISTANCE_REGISTRY, Quantity, Registr
 __all__ = ["convert", "main"]
 
 DISTANCE_FLAGS = ("-d", "--distance")
-USAGE = "usage: conv [-d] <value> <from> <to> | conv [-d] --list"
+USAGE = "usage: conv [-d] <value> <from> <to> | conv [-d] --list | conv --units"
 HELP = f"""{USAGE}
 
 Convert a value between units, e.g. `conv 100 C F` prints 212.0.
@@ -22,7 +22,8 @@ arguments:
 options:
   -h, --help      show this help and exit
   -d, --distance  convert distances (mm, cm, m, km, in, ft, yd, mi) instead of temperatures
-  --list          list the known quantities and their units and exit"""
+  --list          list the known quantities and their units and exit
+  --units         list every supported unit, one per line, grouped by quantity, and exit"""
 
 
 def _parse_value(text: str) -> float:
@@ -69,6 +70,14 @@ def _list(registry: Registry) -> None:
         print(_quantity_line(quantity))
 
 
+def _list_units(registries: list[Registry]) -> None:
+    quantities = [quantity for registry in registries for quantity in registry.quantities()]
+    for quantity in sorted(quantities, key=lambda quantity: quantity.name):
+        print(f"{quantity.name}:")
+        for unit in quantity.units:
+            print(f"  {unit.symbol} ({unit.name})")
+
+
 def main(
     argv: list[str] | None = None,
     registry: Registry | None = None,
@@ -81,11 +90,24 @@ def main(
     (default: the built-in distance registry) serves runs with it.
     """
     args = sys.argv[1:] if argv is None else list(argv)
+    default_registry = DEFAULT_REGISTRY if registry is None else registry
     if any(arg in DISTANCE_FLAGS for arg in args):
         args = [arg for arg in args if arg not in DISTANCE_FLAGS]
         registry = DISTANCE_REGISTRY if distance_registry is None else distance_registry
     if any(arg in ("-h", "--help") for arg in args):
         print(HELP)
+        return 0
+    if "--units" in args:
+        if len(args) != 1:
+            print(USAGE, file=sys.stderr)
+            print("conv: error: --units takes no other arguments", file=sys.stderr)
+            return 1
+        _list_units(
+            [
+                default_registry,
+                DISTANCE_REGISTRY if distance_registry is None else distance_registry,
+            ]
+        )
         return 0
     if "--list" in args:
         if len(args) != 1:
